@@ -231,7 +231,8 @@ app.get('/', async (req, res) => {
         const stats = {
             projectName: PROJECT_NAME,
             totalFarmers: ethers.toNumber(totalFarmers),
-            otherCoolInfo: OTHER_COOL_INFO
+            otherCoolInfo: OTHER_COOL_INFO,
+            documentation: 'https://documenter.getpostman.com/view/19675514/2s9YeBeZQx'
             // You can add more statistics here
         };
 
