@@ -96,6 +96,40 @@ app.post('/updateFarmData', verifyApiKey, async (req, res) => {
     }
 });
 
+app.post('/updateCropData', verifyApiKey, async (req, res) => {
+    const { wallet, cropData } = req.body;
+    try {
+        const updateTx = await contract.updateCropData(wallet, cropData).send({
+            from: process.env.FROM_ADDRESS,
+            gas: 1000000 // Set the gas limit for the transaction
+        });
+        res.json({ success: true, data: updateTx });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.post('/farmer/updateNameAndStart', verifyApiKey, async (req, res) => {
+    const { walletAddress, newName, newStart } = req.body;
+
+    try {
+        // The address that will be used to send this transaction
+        const fromAddress = process.env.FROM_ADDRESS;
+
+        // Send transaction to the smart contract
+        const updateTx = await contract.updateFamerNameAndStart(walletAddress, newName, newStart).send({
+            from: fromAddress,
+            gas: 1000000, // Set the gas limit for the transaction
+        });
+
+        // Respond with success and the transaction receipt
+        res.json({ success: true, transactionReceipt: updateTx });
+    } catch (error) {
+        // If there's an error, respond with the error message
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 app.get('/farmer/:wallet', async (req, res) => {
     const walletAddress = req.params.wallet;
 
@@ -140,14 +174,7 @@ app.get('/farmer/:wallet', async (req, res) => {
     }
 });
 
-// app.post('/updateBioData', (req, res) => {
-//     // Your logic to handle the bio data update
-//     res.send('Bio data updated');
-// });
-
-
 const port = process.env.PORT || 3000;
-
 
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
