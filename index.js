@@ -43,6 +43,10 @@ const verifyApiKey = (req, res, next) => {
     next(); // If the API key is valid, continue
 };
 
+// const verifyFarmer = (req, res, next) => {
+
+// }
+
 // REST API endpoint to setup a farmer
 app.post('/setupFarmer', verifyApiKey, async (req, res) => {
     const { wallet, name, start, bioData, cropData, farmData } = req.body;
@@ -74,61 +78,88 @@ app.post('/setupFarmer', verifyApiKey, async (req, res) => {
 
 app.post('/updateBioData', verifyApiKey, async (req, res) => {
     const { wallet, bioData } = req.body;
-    try {
-        const updateTx = await contract.updateBioData(wallet, bioData).send({
-            from: process.env.FROM_ADDRESS,
-            gas: 1000000
-        });
-        res.json({ success: true, data: updateTx });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+    // Call the balanceOf function from the smart contract
+    const balance = await contract.balanceOf(wallet);
+    if (Number(balance) < 1) {
+        res.status(500).json({ success: false, error: "Farmer does not exist!" });
+    } else {
+        try {
+            const updateTx = await contract.updateBioData(wallet, bioData).send({
+                from: process.env.FROM_ADDRESS,
+                gas: 1000000
+            });
+            res.json({ success: true, data: updateTx });
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ success: false, error: error.message });
+        }
     }
+
 });
 
 app.post('/updateFarmData', verifyApiKey, async (req, res) => {
     const { wallet, farmData } = req.body;
-    try {
-        const updateTx = await contract.updateFarmData(wallet, farmData).send({
-            from: process.env.FROM_ADDRESS,
-            gas: 1000000
-        });
-        res.json({ success: true, data: updateTx });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+    // Call the balanceOf function from the smart contract
+    const balance = await contract.balanceOf(wallet);
+    if (Number(balance) < 1) {
+        res.status(500).json({ success: false, error: "Farmer does not exist!" });
+    } else {
+        try {
+            const updateTx = await contract.updateFarmData(wallet, farmData).send({
+                from: process.env.FROM_ADDRESS,
+                gas: 1000000
+            });
+            res.json({ success: true, data: updateTx });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
     }
+
 });
 
 app.post('/updateCropData', verifyApiKey, async (req, res) => {
     const { wallet, cropData } = req.body;
-    try {
-        const updateTx = await contract.updateCropData(wallet, cropData).send({
-            from: process.env.FROM_ADDRESS,
-            gas: 1000000
-        });
-        res.json({ success: true, data: updateTx });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+    // Call the balanceOf function from the smart contract
+    const balance = await contract.balanceOf(wallet);
+    if (Number(balance) < 1) {
+        res.status(500).json({ success: false, error: "Farmer does not exist!" });
+    } else {
+        try {
+            const updateTx = await contract.updateCropData(wallet, cropData).send({
+                from: process.env.FROM_ADDRESS,
+                gas: 1000000
+            });
+            res.json({ success: true, data: updateTx });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
     }
+
 });
 
 app.post('/farmer/updateNameAndStart', verifyApiKey, async (req, res) => {
     const { walletAddress, newName, newStart } = req.body;
+    // Call the balanceOf function from the smart contract
+    const balance = await contract.balanceOf(walletAddress);
+    if (Number(balance) < 1) {
+        res.status(500).json({ success: false, error: "Farmer does not exist!" });
+    } else {
+        try {
+            // The address that will be used to send this transaction
+            const fromAddress = process.env.FROM_ADDRESS;
 
-    try {
-        // The address that will be used to send this transaction
-        const fromAddress = process.env.FROM_ADDRESS;
+            // Send transaction to the smart contract
+            const updateTx = await contract.updateFamerNameAndStart(walletAddress, newName, newStart).send({
+                from: fromAddress,
+                gas: 1000000
+            });
 
-        // Send transaction to the smart contract
-        const updateTx = await contract.updateFamerNameAndStart(walletAddress, newName, newStart).send({
-            from: fromAddress,
-            gas: 1000000
-        });
-
-        // Respond with success and the transaction receipt
-        res.json({ success: true, data: updateTx });
-    } catch (error) {
-        // If there's an error, respond with the error message
-        res.status(500).json({ success: false, message: error.message });
+            // Respond with success and the transaction receipt
+            res.json({ success: true, data: updateTx });
+        } catch (error) {
+            // If there's an error, respond with the error message
+            res.status(500).json({ success: false, message: error.message });
+        }
     }
 });
 
@@ -142,6 +173,8 @@ app.get('/farmer/:wallet', async (req, res) => {
         // Convert BigInts to strings
         farmerDetailsArray = JSON.parse(JSON.stringify(farmerDetailsArray, (_, v) =>
             typeof v === 'bigint' ? v.toString() : v));
+
+
 
         const farmerDetails = {
             name: farmerDetailsArray[0],
