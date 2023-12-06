@@ -7,7 +7,7 @@ const PROJECT_NAME = 'Agrifi';
 const OTHER_COOL_INFO = 'AgriFi seeks to reimagine how farmers engage with the market and exercise their sovereignty.\n\n Through digitalization and smart contracts on Toronet, agricultural markets can become fairer, more transparent, more connected, and more inclusive.';
 
 const contractABI = require('./contractABI.json');
-const contractAddress = '0x31b3d2B6f4eac5828e6149934232Ac8167A0B561';
+const contractAddress = '0xF039EEa7e5dc44f8979c3198C62B529829F04147';
 
 const key = process.env.PRIVATE_KEY;
 const prov = process.env.RPC_URL;
@@ -49,10 +49,7 @@ const verifyApiKey = (req, res, next) => {
 
 // REST API endpoint to setup a farmer
 app.post('/setupFarmer', verifyApiKey, async (req, res) => {
-    const { wallet, name, start, bioData, cropData, farmData } = req.body;
-
-    // The address that will be used to send this transaction
-    const fromAddress = process.env.FROM_ADDRESS;
+    const { wallet, name, start, loanAmount, bioData, cropData, farmData } = req.body;
 
     // Send transaction to the smart contract
     try {
@@ -60,16 +57,18 @@ app.post('/setupFarmer', verifyApiKey, async (req, res) => {
             wallet,
             name,
             start,
+            loanAmount,
             bioData,
             cropData,
             farmData
-        ).send({
-            from: fromAddress,
-            gas: 1000000
-        });
+        );
+
+        const result = await setupFarmerTx.wait();
+        const reciept = { hash: result.hash, valid: result.status === 1 ? true : false }
+        console.log(reciept)
 
         // If the transaction is successful, send back the transaction receipt
-        res.json({ success: true, transaction: setupFarmerTx });
+        res.json({ success: true, reciept });
     } catch (error) {
         // If there's an error, send back the error message
         res.status(500).json({ success: false, message: error.message });
@@ -84,11 +83,10 @@ app.post('/updateBioData', verifyApiKey, async (req, res) => {
         res.status(500).json({ success: false, error: "Farmer does not exist!" });
     } else {
         try {
-            const updateTx = await contract.updateBioData(wallet, bioData).send({
-                from: process.env.FROM_ADDRESS,
-                gas: 1000000
-            });
-            res.json({ success: true, data: updateTx });
+            const updateTx = await contract.updateBioData(wallet, bioData);
+            const result = await updateTx.wait();
+            const data = { hash: result.hash, valid: result.status === 1 ? true : false }
+            res.json({ success: true, data });
         } catch (error) {
             console.log(error)
             res.status(500).json({ success: false, error: error.message });
@@ -170,6 +168,8 @@ app.get('/farmer/:wallet', async (req, res) => {
         // Call the function that returns farmer details
         let farmerDetailsArray = await contract.farmers(walletAddress);
 
+        console.log(farmerDetailsArray)
+
         // Convert BigInts to strings
         farmerDetailsArray = JSON.parse(JSON.stringify(farmerDetailsArray, (_, v) =>
             typeof v === 'bigint' ? v.toString() : v));
@@ -179,25 +179,27 @@ app.get('/farmer/:wallet', async (req, res) => {
         const farmerDetails = {
             name: farmerDetailsArray[0],
             wallet: farmerDetailsArray[1],
+            // pools: farmerDetailsArray[2],
             start: farmerDetailsArray[2],
             sbtID: farmerDetailsArray[3],
+            loanAmount: farmerDetailsArray[4],
             bioData: {
-                stateOfOrigin: farmerDetailsArray[4][0],
-                maritalStatus: farmerDetailsArray[4][1],
-                religion: farmerDetailsArray[4][2],
-                dateOfBirth: farmerDetailsArray[4][3]
+                stateOfOrigin: farmerDetailsArray[5][0],
+                maritalStatus: farmerDetailsArray[5][1],
+                religion: farmerDetailsArray[5][2],
+                dateOfBirth: farmerDetailsArray[5][3]
             },
             cropData: {
-                primary: farmerDetailsArray[5][0],
-                secondary: farmerDetailsArray[5][1],
-                tetiary: farmerDetailsArray[5][2]
+                primary: farmerDetailsArray[6][0],
+                secondary: farmerDetailsArray[6][1],
+                tetiary: farmerDetailsArray[6][2]
             },
             farmData: {
-                farmName: farmerDetailsArray[6][0],
-                farmersAssociation: farmerDetailsArray[6][1],
-                farmingSeason: farmerDetailsArray[6][2],
-                sizeOfFarmInHectares: farmerDetailsArray[6][3],
-                averageYieldPerHarvestInMetricTons: farmerDetailsArray[6][4]
+                farmName: farmerDetailsArray[7][0],
+                farmersAssociation: farmerDetailsArray[7][1],
+                farmingSeason: farmerDetailsArray[7][2],
+                sizeOfFarmInHectares: farmerDetailsArray[7][3],
+                averageYieldPerHarvestInMetricTons: farmerDetailsArray[7][4]
             }
         };
 
