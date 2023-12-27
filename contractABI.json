@@ -371,6 +371,11 @@
 				"type": "uint256"
 			},
 			{
+				"internalType": "string",
+				"name": "_profileImage",
+				"type": "string"
+			},
+			{
 				"components": [
 					{
 						"internalType": "string",
@@ -621,6 +626,24 @@
 			}
 		],
 		"name": "updateFarmData",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_wallet",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "newImage",
+				"type": "string"
+			}
+		],
+		"name": "updateProfileImage",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -898,6 +921,25 @@
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "profileImage",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
 			}
 		],
 		"stateMutability": "view",

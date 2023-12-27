@@ -1,0 +1,26 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "No frontend commands to run"
+    build:
+      commands:
+        - echo "No frontend build"
+  artifacts:
+    baseDirectory: /
+    files:
+      - "**/*"
+backend:
+  phases:
+    preBuild:
+      commands:
+        - npm install
+    build:
+      commands:
+        - echo "Running build commands for Node.js application"
+        - node index.js
+  artifacts:
+    baseDirectory: /
+    files:
+      - "**/*"

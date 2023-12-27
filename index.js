@@ -7,7 +7,8 @@ const PROJECT_NAME = 'Agrifi';
 const OTHER_COOL_INFO = 'AgriFi seeks to reimagine how farmers engage with the market and exercise their sovereignty.\n\n Through digitalization and smart contracts on Toronet, agricultural markets can become fairer, more transparent, more connected, and more inclusive.';
 
 const contractABI = require('./contractABI.json');
-const contractAddress = '0xF039EEa7e5dc44f8979c3198C62B529829F04147';
+// const contractAddress = '0xF039EEa7e5dc44f8979c3198C62B529829F04147';
+const contractAddress = '0x77f89353d4fA2610710A2089771d028Eab3127a4'; // with logic @ 0x47E14b46a986F027a7E98680b8829A8891b149ce
 
 const key = process.env.PRIVATE_KEY;
 const prov = process.env.RPC_URL;
@@ -49,7 +50,7 @@ const verifyApiKey = (req, res, next) => {
 
 // REST API endpoint to setup a farmer
 app.post('/setupFarmer', verifyApiKey, async (req, res) => {
-    const { wallet, name, start, loanAmount, bioData, cropData, farmData } = req.body;
+    const { wallet, name, start, loanAmount, profileImage, bioData, cropData, farmData } = req.body;
 
     // Send transaction to the smart contract
     try {
@@ -58,6 +59,7 @@ app.post('/setupFarmer', verifyApiKey, async (req, res) => {
             name,
             start,
             loanAmount,
+            profileImage,
             bioData,
             cropData,
             farmData
@@ -103,10 +105,7 @@ app.post('/updateFarmData', verifyApiKey, async (req, res) => {
         res.status(500).json({ success: false, error: "Farmer does not exist!" });
     } else {
         try {
-            const updateTx = await contract.updateFarmData(wallet, farmData).send({
-                from: process.env.FROM_ADDRESS,
-                gas: 1000000
-            });
+            const updateTx = await contract.updateFarmData(wallet, farmData);
             res.json({ success: true, data: updateTx });
         } catch (error) {
             res.status(500).json({ success: false, error: error.message });
@@ -123,10 +122,24 @@ app.post('/updateCropData', verifyApiKey, async (req, res) => {
         res.status(500).json({ success: false, error: "Farmer does not exist!" });
     } else {
         try {
-            const updateTx = await contract.updateCropData(wallet, cropData).send({
-                from: process.env.FROM_ADDRESS,
-                gas: 1000000
-            });
+            const updateTx = await contract.updateCropData(wallet, cropData);
+            res.json({ success: true, data: updateTx });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    }
+
+});
+
+app.post('/updateProfileImage', verifyApiKey, async (req, res) => {
+    const { wallet, newImage } = req.body;
+    // Call the balanceOf function from the smart contract
+    const balance = await contract.balanceOf(wallet);
+    if (Number(balance) < 1) {
+        res.status(500).json({ success: false, error: "Farmer does not exist!" });
+    } else {
+        try {
+            const updateTx = await contract.updateProfileImage(wallet, newImage);
             res.json({ success: true, data: updateTx });
         } catch (error) {
             res.status(500).json({ success: false, error: error.message });
@@ -147,10 +160,7 @@ app.post('/farmer/updateNameAndStart', verifyApiKey, async (req, res) => {
             const fromAddress = process.env.FROM_ADDRESS;
 
             // Send transaction to the smart contract
-            const updateTx = await contract.updateFamerNameAndStart(walletAddress, newName, newStart).send({
-                from: fromAddress,
-                gas: 1000000
-            });
+            const updateTx = await contract.updateFamerNameAndStart(walletAddress, newName, newStart);
 
             // Respond with success and the transaction receipt
             res.json({ success: true, data: updateTx });
@@ -247,7 +257,7 @@ app.get('/token/:tokenId', async (req, res) => {
         // Call the tokenURI function from the smart contract
         const uri = await contract.tokenURI(tokenId);
 
-        jsonObject = await parseTokenUri(uri);
+        const jsonObject = await parseTokenUri(uri);
 
         // Respond with the URI
         res.json({ success: true, tokenURI: jsonObject });
