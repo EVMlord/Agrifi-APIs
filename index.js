@@ -210,7 +210,7 @@ app.get('/farmer/:wallet', async (req, res) => {
 
     try {
         // Call the function that returns farmer details
-        let farmerDetailsArray = await contract.farmers(walletAddress);
+        let farmerDetailsArray = await contract.farmersData(walletAddress);
 
         console.log(farmerDetailsArray)
 
@@ -224,32 +224,35 @@ app.get('/farmer/:wallet', async (req, res) => {
             name: farmerDetailsArray[0],
             wallet: farmerDetailsArray[1],
             // pools: farmerDetailsArray[2],
-            start: farmerDetailsArray[2],
-            sbtID: farmerDetailsArray[3],
-            loanAmount: farmerDetailsArray[4],
+            pool: farmerDetailsArray[2],
+            start: farmerDetailsArray[3],
+            sbtID: farmerDetailsArray[4],
+            loanAmount: farmerDetailsArray[5],
+            isFunded: farmerDetailsArray[6],
             bioData: {
-                stateOfOrigin: farmerDetailsArray[5][0],
-                maritalStatus: farmerDetailsArray[5][1],
-                religion: farmerDetailsArray[5][2],
-                dateOfBirth: farmerDetailsArray[5][3]
+                stateOfOrigin: farmerDetailsArray[7][0],
+                maritalStatus: farmerDetailsArray[7][1],
+                religion: farmerDetailsArray[7][2],
+                dateOfBirth: farmerDetailsArray[7][3]
             },
             cropData: {
-                primary: farmerDetailsArray[6][0],
-                secondary: farmerDetailsArray[6][1],
-                tetiary: farmerDetailsArray[6][2]
+                primary: farmerDetailsArray[8][0],
+                secondary: farmerDetailsArray[8][1],
+                tetiary: farmerDetailsArray[8][2]
             },
             farmData: {
-                farmName: farmerDetailsArray[7][0],
-                farmersAssociation: farmerDetailsArray[7][1],
-                farmingSeason: farmerDetailsArray[7][2],
-                sizeOfFarmInHectares: farmerDetailsArray[7][3],
-                averageYieldPerHarvestInMetricTons: farmerDetailsArray[7][4]
+                farmName: farmerDetailsArray[9][0],
+                farmersAssociation: farmerDetailsArray[9][1],
+                farmingSeason: farmerDetailsArray[9][2],
+                sizeOfFarmInHectares: farmerDetailsArray[9][3],
+                averageYieldPerHarvestInMetricTons: farmerDetailsArray[9][4]
             }
         };
 
         // Respond with the farmer details
         res.json({ success: true, farmerDetails });
     } catch (error) {
+        console.log(error)
         // If there's an error, send back the error message
         res.status(500).json({ success: false, message: error.message });
     }
