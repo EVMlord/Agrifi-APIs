@@ -6,9 +6,15 @@ require('dotenv').config();
 const PROJECT_NAME = 'Agrifi';
 const OTHER_COOL_INFO = 'AgriFi seeks to reimagine how farmers engage with the market and exercise their sovereignty.\n\n Through digitalization and smart contracts on Toronet, agricultural markets can become fairer, more transparent, more connected, and more inclusive.';
 
-const contractABI = require('./contractABI.json');
+const sbtABI = require('./ABIs/sbtABI.json');
+const poooolABI = require('./ABIs/FundingPoolABI.json');
+const factoryABI = require('./ABIs/PoolFactoryABI.json');
+const badgeABI = require('./ABIs/InvestorBadgeABI.json');
 // const contractAddress = '0xF039EEa7e5dc44f8979c3198C62B529829F04147';
-const contractAddress = '0x77f89353d4fA2610710A2089771d028Eab3127a4'; // with logic @ 0x47E14b46a986F027a7E98680b8829A8891b149ce
+// const sbtAddress = '0x77f89353d4fA2610710A2089771d028Eab3127a4'; // with logic @ 0x47E14b46a986F027a7E98680b8829A8891b149ce
+const sbtAddress = '0x9595c8ce10e87d5D98Cc381F3C3546E54736b3fF'; // with logic @ 0x6CA1b2147dAF94A6604671094737124f9635fcd7
+const badgeAddress = "0x3D742c8f100B6912E74f6cC9f2FcC277B4B1D756";
+const factoryAddress = "0xe01ac067FF9b2AB48419e6E615f3B4ee2dbF80cd";
 
 const key = process.env.PRIVATE_KEY;
 const prov = process.env.RPC_URL;
@@ -24,7 +30,9 @@ const signer = wallet.connect(provider);
 const app = express();
 app.use(bodyParser.json());
 
-const contract = new ethers.Contract(contractAddress, contractABI, signer);
+const contract = new ethers.Contract(sbtAddress, sbtABI, signer);
+const badgeContract = new ethers.Contract(badgeAddress, badgeABI, signer);
+const factoryontract = new ethers.Contract(factoryAddress, factoryABI, signer);
 
 // // Middleware for API key verification
 // app.use((req, res, next) => {
@@ -157,7 +165,7 @@ app.post('/farmer/updateNameAndStart', verifyApiKey, async (req, res) => {
     } else {
         try {
             // The address that will be used to send this transaction
-            const fromAddress = process.env.FROM_ADDRESS;
+            // const fromAddress = process.env.FROM_ADDRESS;
 
             // Send transaction to the smart contract
             const updateTx = await contract.updateFamerNameAndStart(walletAddress, newName, newStart);
@@ -170,6 +178,32 @@ app.post('/farmer/updateNameAndStart', verifyApiKey, async (req, res) => {
         }
     }
 });
+
+app.post('/pool/create', verifyApiKey, async (req, res) => {
+    const { name, crop, risk, estimatedYield, cycle } = req.body;
+
+    try {
+        // The address that will be used to send this transaction
+        // const fromAddress = process.env.FROM_ADDRESS;
+
+        // Send transaction to the smart contract
+        const createTx = await factoryontract.createFundingPool(name, crop, risk, estimatedYield, cycle);
+
+        const result = await createTx.wait();
+        const reciept = { hash: result.hash, valid: result.status === 1 ? true : false }
+        console.log(reciept)
+
+        // If the transaction is successful, send back the transaction receipt
+        res.json({ success: true, reciept });
+
+        // // Respond with success and the transaction receipt
+        // res.json({ success: true, data: createTx });
+    } catch (error) {
+        // If there's an error, respond with the error message
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 
 app.get('/farmer/:wallet', async (req, res) => {
     const walletAddress = req.params.wallet;

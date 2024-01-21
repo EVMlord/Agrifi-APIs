@@ -1,0 +1,439 @@
+[
+    {
+        "inputs": [
+            {
+                "internalType": "contract IAgrifyFarmer",
+                "name": "_sbt",
+                "type": "address"
+            },
+            {
+                "internalType": "contract IBadge",
+                "name": "_badge",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "previousOwner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "contract AgrifyFundingPool",
+                "name": "Pool",
+                "type": "address"
+            }
+        ],
+        "name": "createdFundingPool",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "BADGE",
+        "outputs": [
+            {
+                "internalType": "contract IBadge",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "Controller",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "SBT",
+        "outputs": [
+            {
+                "internalType": "contract IAgrifyFarmer",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "investor",
+                "type": "address"
+            }
+        ],
+        "name": "badgeInvestor",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newController",
+                "type": "address"
+            }
+        ],
+        "name": "changeController",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "crop",
+                "type": "string"
+            },
+            {
+                "internalType": "enum RiskProfile",
+                "name": "risk",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint256",
+                "name": "estimatedYield",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "cycle",
+                "type": "uint256"
+            }
+        ],
+        "name": "createFundingPool",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "howMany",
+                "type": "uint256"
+            }
+        ],
+        "name": "createNewBlanks",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "number",
+                "type": "uint256"
+            }
+        ],
+        "name": "getPool",
+        "outputs": [
+            {
+                "internalType": "contract AgrifyFundingPool",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "pageNumber",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "pageLength",
+                "type": "uint256"
+            }
+        ],
+        "name": "getPoolDetails",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "pool",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "crop",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "enum RiskProfile",
+                        "name": "riskProfile",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "farmersCount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "investorsCount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "fundingAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "estimatedYield",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "cycle",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "benchmark",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isApproved",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "fundedAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "stillActive",
+                        "type": "bool"
+                    }
+                ],
+                "internalType": "struct PoolData[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "howManyPools",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "PoolCount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "isAuth",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "isPool",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "contract IBEP20",
+                "name": "tokenAddress",
+                "type": "address"
+            }
+        ],
+        "name": "recoverTokens",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "addr",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "status",
+                "type": "bool"
+            }
+        ],
+        "name": "setAuthorised",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "wallet",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "status",
+                "type": "bool"
+            }
+        ],
+        "name": "updateFundedState",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "wallet",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_pool",
+                "type": "address"
+            }
+        ],
+        "name": "updatePoolAddress",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "withdraw",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "stateMutability": "payable",
+        "type": "receive"
+    }
+]
