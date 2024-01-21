@@ -7,7 +7,7 @@ const PROJECT_NAME = 'Agrifi';
 const OTHER_COOL_INFO = 'AgriFi seeks to reimagine how farmers engage with the market and exercise their sovereignty.\n\n Through digitalization and smart contracts on Toronet, agricultural markets can become fairer, more transparent, more connected, and more inclusive.';
 
 const sbtABI = require('./ABIs/sbtABI.json');
-const poooolABI = require('./ABIs/FundingPoolABI.json');
+const poolABI = require('./ABIs/FundingPoolABI.json');
 const factoryABI = require('./ABIs/PoolFactoryABI.json');
 const badgeABI = require('./ABIs/InvestorBadgeABI.json');
 // const contractAddress = '0xF039EEa7e5dc44f8979c3198C62B529829F04147';
@@ -302,6 +302,111 @@ app.get('/token/:tokenId', async (req, res) => {
         // If there's an error, respond with the error message
         res.status(500).json({ success: false, message: error.message });
     }
+});
+
+app.get('/pool/count', async (req, res) => {
+    try {
+        const count = await factoryontract.howManyPools();
+
+        res.json({ success: true, data: ethers.toNumber(count) });
+    } catch (error) {
+        // If there's an error, respond with the error message
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.get('/pool/details/:pageNumber/:pageLength', async (req, res) => {
+    const pageNumber = req.params.pageNumber;
+    const pageLength = req.params.pageLength;
+
+    try {
+        // Call the getPoolDetails function from the factory smart contract
+        const details = await factoryontract.getPoolDetails(pageNumber, pageLength);
+        // console.log(details)
+
+        // const serializedDetails = details.map(pool =>
+        //     pool.map(item =>
+        //         (typeof item === 'bigint') ? item.toString() : item
+        //     )
+        // );
+
+        // console.log(serializedDetails);
+
+        const poolDataKeys = [
+            'pool', 'name', 'crop', 'riskProfile', 'farmersCount', 'investorsCount',
+            'fundingAmount', 'estimatedYield', 'cycle', 'benchmark',
+            'isApproved', 'fundedAmount', 'stillActive'
+        ];
+
+        // Mapping for RiskProfile enum
+        const riskProfileMapping = {
+            '0': 'HIGH',
+            '1': 'MEDIUM',
+            '2': 'LOW'
+        };
+
+        // Convert array of arrays to array of objects
+        const formattedDetails = details.map(pool => {
+            let poolObject = {};
+            pool.forEach((value, index) => {
+                let key = poolDataKeys[index];
+                // Convert BigInt to string for JSON serialization, if necessary
+                // Convert riskProfile number to string representation
+                if (key === 'riskProfile') {
+                    poolObject[key] = riskProfileMapping[value.toString()];
+                } else {
+                    poolObject[key] = typeof value === 'bigint' ? value.toString() : value;
+                }
+            });
+            return poolObject;
+        });
+
+        res.json({ success: true, data: formattedDetails });
+    } catch (error) {
+        // If there's an error, respond with the error message
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.get('/pool/data/:poolAddr', async (req, res) => {
+    try {
+        const poolAddr = req.params.poolAddr;
+        const poolContract = new ethers.Contract(poolAddr, poolABI, signer);
+        const _data = await poolContract.poolData();
+
+        console.log(_data)
+
+        const poolDataKeys = [
+            'pool', 'name', 'crop', 'riskProfile', 'farmersCount', 'investorsCount',
+            'fundingAmount', 'estimatedYield', 'cycle', 'benchmark',
+            'isApproved', 'fundedAmount', 'stillActive'
+        ];
+
+        // Mapping for RiskProfile enum
+        const riskProfileMapping = {
+            '0': 'HIGH',
+            '1': 'MEDIUM',
+            '2': 'LOW'
+        };
+
+        let formattedData = {};
+        _data.forEach((value, index) => {
+            let key = poolDataKeys[index];
+            // Convert BigInt to string for JSON serialization, if necessary
+            // Convert riskProfile number to string representation
+            if (key === 'riskProfile') {
+                formattedData[key] = riskProfileMapping[value.toString()];
+            } else {
+                formattedData[key] = typeof value === 'bigint' ? value.toString() : value;
+            }
+        });
+
+        res.json({ success: true, data: formattedData });
+    } catch (error) {
+        // If there's an error, respond with the error message
+        res.status(500).json({ success: false, message: error.message });
+    }
+
 });
 
 app.get('/', async (req, res) => {

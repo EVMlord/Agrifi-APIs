@@ -1,0 +1,17 @@
+Result(1) [
+  Result(13) [
+    '0x5c40860112E2Dbe347B1EaE4711C84c1556EBe45',
+    'Dangote Pool',
+    'Rice',
+    0n,
+    0n,
+    0n,
+    0n,
+    750n,
+    180n,
+    0n,
+    true,
+    0n,
+    false
+  ]
+]
