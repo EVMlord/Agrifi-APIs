@@ -115,6 +115,19 @@
     },
     {
         "inputs": [],
+        "name": "getFarmers",
+        "outputs": [
+            {
+                "internalType": "address[]",
+                "name": "",
+                "type": "address[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "getInvestorAddresses",
         "outputs": [
             {
@@ -140,26 +153,15 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "pageNumber",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "pageLength",
-                "type": "uint256"
-            }
-        ],
-        "name": "getInvestorDetails",
+        "inputs": [],
+        "name": "getInvestorData",
         "outputs": [
             {
                 "components": [
                     {
-                        "internalType": "uint256",
-                        "name": "id",
-                        "type": "uint256"
+                        "internalType": "address",
+                        "name": "investor",
+                        "type": "address"
                     },
                     {
                         "internalType": "address",
@@ -168,31 +170,53 @@
                     },
                     {
                         "internalType": "uint256",
-                        "name": "investmentValue",
+                        "name": "percentageOwned",
                         "type": "uint256"
                     },
                     {
-                        "internalType": "uint256",
-                        "name": "refundedAmount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "startTimestamp",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "endTimestamp",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "bool",
-                        "name": "withdrawn",
-                        "type": "bool"
+                        "components": [
+                            {
+                                "internalType": "uint256",
+                                "name": "id",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "pool",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "investmentValue",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "refundedAmount",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "startTimestamp",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "endTimestamp",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "withdrawn",
+                                "type": "bool"
+                            }
+                        ],
+                        "internalType": "struct Investor",
+                        "name": "details",
+                        "type": "tuple"
                     }
                 ],
-                "internalType": "struct Investor[]",
+                "internalType": "struct InvestorData[]",
                 "name": "",
                 "type": "tuple[]"
             }

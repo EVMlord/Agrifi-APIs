@@ -14,7 +14,8 @@ const badgeABI = require('./ABIs/InvestorBadgeABI.json');
 // const sbtAddress = '0x77f89353d4fA2610710A2089771d028Eab3127a4'; // with logic @ 0x47E14b46a986F027a7E98680b8829A8891b149ce
 const sbtAddress = '0x9595c8ce10e87d5D98Cc381F3C3546E54736b3fF'; // with logic @ 0x6CA1b2147dAF94A6604671094737124f9635fcd7
 const badgeAddress = "0x3D742c8f100B6912E74f6cC9f2FcC277B4B1D756";
-const factoryAddress = "0xe01ac067FF9b2AB48419e6E615f3B4ee2dbF80cd";
+// const factoryAddress = "0xe01ac067FF9b2AB48419e6E615f3B4ee2dbF80cd";
+const factoryAddress = "0x938BCBb83fF5B673D5b6FeD6b7168650402ed9b3";
 
 const key = process.env.PRIVATE_KEY;
 const prov = process.env.RPC_URL;
@@ -190,6 +191,31 @@ app.post('/pool/create', verifyApiKey, async (req, res) => {
         const createTx = await factoryontract.createFundingPool(name, crop, risk, estimatedYield, cycle);
 
         const result = await createTx.wait();
+        const reciept = { hash: result.hash, valid: result.status === 1 ? true : false }
+        console.log(reciept)
+
+        // If the transaction is successful, send back the transaction receipt
+        res.json({ success: true, reciept });
+
+        // // Respond with success and the transaction receipt
+        // res.json({ success: true, data: createTx });
+    } catch (error) {
+        // If there's an error, respond with the error message
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.post('/pool/map-farmers', verifyApiKey, async (req, res) => {
+    const { poolAddr, farmers } = req.body;
+
+    try {
+
+        const poolContract = new ethers.Contract(poolAddr, poolABI, signer);
+
+        // Send transaction to the smart contract
+        const mapTx = await poolContract.mapFarmers(farmers);
+
+        const result = await mapTx.wait();
         const reciept = { hash: result.hash, valid: result.status === 1 ? true : false }
         console.log(reciept)
 
@@ -403,6 +429,71 @@ app.get('/pool/data/:poolAddr', async (req, res) => {
 
         res.json({ success: true, data: formattedData });
     } catch (error) {
+        // If there's an error, respond with the error message
+        res.status(500).json({ success: false, message: error.message });
+    }
+
+});
+
+app.get('/pool/farmers/:poolAddr', async (req, res) => {
+    try {
+        const poolAddr = req.params.poolAddr;
+        const poolContract = new ethers.Contract(poolAddr, poolABI, signer);
+        const farmers = await poolContract.getFarmers();
+
+        console.log(farmers)
+
+        res.json({ success: true, data: farmers });
+    } catch (error) {
+        console.log(error)
+        // If there's an error, respond with the error message
+        res.status(500).json({ success: false, message: error.message });
+    }
+
+});
+
+app.get('/pool/investors/:poolAddr', async (req, res) => {
+    try {
+        const poolAddr = req.params.poolAddr;
+        const poolContract = new ethers.Contract(poolAddr, poolABI, signer);
+        const investors = await poolContract.getInvestorData();
+
+        console.log(investors)
+
+        // Define keys for the Investor and InvestorData structs
+        const investorKeys = ['id', 'pool', 'investmentValue', 'refundedAmount', 'startTimestamp', 'endTimestamp', 'withdrawn'];
+        const investorDataKeys = ['investor', 'pool', 'percentageOwned', 'details'];
+
+        // Function to convert a single Investor struct to an object
+        function formatInvestor(investor) {
+            let formattedInvestor = {};
+            investor.forEach((value, index) => {
+                let key = investorKeys[index];
+                formattedInvestor[key] = typeof value === 'bigint' ? value.toString() : value;
+            });
+            return formattedInvestor;
+        }
+
+        // Convert array of InvestorData structs to array of objects
+        const formattedInvestors = investors.map(investorData => {
+            let formattedInvestorData = {};
+            investorData.forEach((value, index) => {
+                let key = investorDataKeys[index];
+                if (key === 'details') {
+                    // Special handling for the nested Investor struct
+                    formattedInvestorData[key] = formatInvestor(value);
+                } else {
+                    formattedInvestorData[key] = typeof value === 'bigint' ? value.toString() : value;
+                }
+            });
+            return formattedInvestorData;
+        });
+
+        console.log(formattedInvestors)
+
+        res.json({ success: true, data: formattedInvestors });
+    } catch (error) {
+        console.log(error)
         // If there's an error, respond with the error message
         res.status(500).json({ success: false, message: error.message });
     }
